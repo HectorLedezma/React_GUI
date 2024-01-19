@@ -4,8 +4,10 @@ from tkinter import filedialog
 import os
 from shell import Shell
 from Gui.Loading import LoadingAnimation
+from Gui.Terminal1 import TerminalApp
 from threading import Thread
 import time
+from tqdm import tqdm
 
 
 
@@ -15,7 +17,7 @@ class Frame:
         directorio_personal = os.path.expanduser("~")
         self.directorio_documentos = os.path.join(directorio_personal, "Documentos")
         self.mensaje = tk.Label(self.ventana, text="",font=("Helvetica", 20,"bold"))
-        self.load = LoadingAnimation(self.ventana,self.mensaje)
+        #self.load = LoadingAnimation(self.ventana,self.mensaje)
         
     def show(self):
         def obtener_texto():
@@ -23,24 +25,72 @@ class Frame:
             print(texto_ingresado)
             #etiqueta.config(text="Texto ingresado: " + texto_ingresado)
         
-        def funcion(l):
-            for i in range(l):
-                time.sleep(1)
+        def funcion():
+            print('Cargando.')
+            print('cargando..')
+            print('cargando...')
+            loop = tqdm(total=50000,position=0,leave=False)
+            for i in range(50000):
+                loop.set_description('Loading...'.format(i))
+                loop.update(1)
+            loop.close()
+            print('Listo')
+            #app.stop_animation()
+            #for i in range(l):
+            #    print(i,end='\r')
+            #    time.sleep(1)
+            
+        
+        def noSpace(route):
+            print(route)
+            indexes = []
+            for i in range(len(route)):
+                if route[i] == chr(32):
+                    indexes.append(i)
                 
-                
+            charList = list(route)
+            iPos = 0
+            for pos in indexes:
+                charList.insert(pos+iPos,chr(92))
+                iPos += 1
+            newString = ''.join(charList)
+            return newString
         
         def seleccionar_directorio():
             # Construimos la ruta completa al directorio "Documentos"
             texto_ingresado = cuadro_texto.get()
             self.directorio_documentos = filedialog.askdirectory(initialdir=self.directorio_documentos)
-            comando = "cd "+str(self.directorio_documentos)+"\nnpx create-react-app "+texto_ingresado
+            
+            comando = "cd "+noSpace(str(self.directorio_documentos))+"\nnpx create-react-app "+texto_ingresado
             #print(comando)
             if validaInput(texto_ingresado) == 0:
+                self.mensaje.config(text="Creando proyecto "+texto_ingresado+"\nPor favor espere...",fg='black')
+                Shell.exec(comando)
+                self.mensaje.config(text="Proyecto "+texto_ingresado+"\ncreado exitodamente",fg='green')
+                #self.load.start_animation()
+                #print(noSpace(self.directorio_documentos))
+                #TerminalApp(self.ventana,comando)
+                #
                 
-                animation_thread = Thread(target=self.load.start_animation,name="animation")
-                animation_thread.start()
-                funcion(10)
-                ##load.stop_animation()
+                #self.ventana.after(10,funcion)
+                #(self.load)
+                
+                
+                #self.load.stop_animation()
+                
+                #self.ventana.after(0,lambda:funcion(10,self.load))
+                
+                
+                #animation_thread = Thread(target=self.load.start_animation,name="animation")
+                #animation_thread.start()
+                
+                #funcion(10)
+                
+                #self.load.stop_animation()
+                
+                #animation_thread.join()
+                #
+                #
                 #print(load.loading_image)
                 #Shell.exec(comando)
                 #error.config(text="El Proyecto "+texto_ingresado+" fue creado con exito en\n"+str(self.directorio_documentos),fg="green")
@@ -53,7 +103,7 @@ class Frame:
 
         def validaInput(txt):
             ok = 0
-            print('txt:',txt)
+            #print('txt:',txt)
             if txt == "" or txt == None:
                 ok = 2
             else:
@@ -61,7 +111,7 @@ class Frame:
                     if ord(i) >= 65 and ord(i) <=90:
                         ok = 1
                         break
-            print('Estado:',ok)
+            #print('Estado:',ok)
             return ok
         
         self.ventana.title("Nuevo proyecto")

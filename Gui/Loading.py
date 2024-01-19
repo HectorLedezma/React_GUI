@@ -2,7 +2,7 @@ import tkinter as tk
 from itertools import cycle
 from PIL import ImageTk, Image
 import numpy as np
-
+import time
 
 class LoadingAnimation:
     def __init__(self, master,message):
@@ -26,23 +26,21 @@ class LoadingAnimation:
     def start_animation(self):
         self.canvas.pack()
         self.message.config(text="Cargando...",fg="black")
+        print('cargando...')
         self.master.after(40, self.animate)
+        
     
     def animate(self):
         if(not self.end):
             self.canvas.itemconfig(self.loading_image, image=next(self.loading_animation))
-            
-            #self.message.config(text=str(self.iterator),fg="black")
-            #self.iterator += 1
-            
+            #time.sleep(0.4)
+            #self.animate()
             self.master.after(40, self.animate)
-        #else:
-            
-
-    
+        
     
     def stop_animation(self):
-        self.master.after_cancel(self.animate)
+        #self.master.after_cancel(self.animate)
         self.end = True
         self.message.config(text="!Listo¡",fg="green")
+        print('stop')
         
